@@ -1,0 +1,37 @@
+<body>
+    <div class="error-container">
+        <div class="error-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="12" y1="8" x2="12" y2="12"></line>
+                <line x1="12" y1="16" x2="12.01" y2="16"></line>
+            </svg>
+        </div>
+        
+        <h1 class="error-title">Something Went Wrong</h1>
+        
+        <p class="error-message">
+            We encountered an error while processing your request. Please try again later or contact support if the problem persists.
+        </p>
+        
+        <div class="error-code">Error Code: ERR_SERVER_500</div>
+        
+        <div class="action-buttons">
+            <button class="back-button" onclick="window.history.back()">Go Back</button>
+            <button class="retry-button" onclick="window.location.reload()">Try Again</button>
+        </div>
+        
+        <button class="toggle-details" id="toggle-details">Show Technical Details</button>
+        
+        <pre class="error-details" id="error-details">
+Error: Internal Server Error
+Time: 2025-04-04T10:15:32Z
+Request ID: 8f4d9e21-c7a5-4b6a-9d8e-3f1c5e4a2b3d
+Path: /api/images/upload
+        </pre>
+        
+        <p class="help-text">
+            Need assistance? Visit our <a href="#" class="help-link">Help Center</a> or <a href="#" class="help-link">Contact Support</a>
+        </p>
+    </div>
+</body>

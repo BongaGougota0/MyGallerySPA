@@ -1,0 +1,156 @@
+<body>
+    <header>
+        <div class="logo">Image Gallery</div>
+        <div class="user-info">
+            <span class="user-name">John Doe</span>
+            <button class="logout-btn" onclick="location.href='login.html'">Logout</button>
+        </div>
+    </header>
+    
+    <main>
+        <div class="sidebar">
+            <ul class="sidebar-nav">
+                <li><a href="dashboard.html" class="active">My Gallery</a></li>
+                <li><a href="other-gallery.html">Public Gallery</a></li>
+                <li><a href="profile.html">Profile Settings</a></li>
+            </ul>
+            
+            <div class="action-buttons">
+                <button class="action-btn" id="upload-btn">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                        <polyline points="17 8 12 3 7 8"></polyline>
+                        <line x1="12" y1="3" x2="12" y2="15"></line>
+                    </svg>
+                    Upload Image
+                </button>
+                <button class="action-btn">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="22 12 16 12 14 15 10 15 8 12 2 12"></polyline>
+                        <path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"></path>
+                    </svg>
+                    Create Album
+                </button>
+            </div>
+        </div>
+        
+        <div class="content">
+            <h1 class="page-title">My Gallery</h1>
+            
+            <div class="gallery">
+                <!-- Sample gallery items -->
+                <div class="image-card">
+                    <div class="image-container">
+                        <img src="/api/placeholder/400/320" alt="Sample Image">
+                        <div class="image-overlay">
+                            <button class="overlay-button">View</button>
+                            <button class="overlay-button">Edit</button>
+                        </div>
+                    </div>
+                    <div class="image-details">
+                        <div class="image-name">Sunset.jpg</div>
+                        <div class="image-date">Uploaded on Apr 2, 2025</div>
+                    </div>
+                </div>
+                
+                <div class="image-card">
+                    <div class="image-container">
+                        <img src="/api/placeholder/400/320" alt="Sample Image">
+                        <div class="image-overlay">
+                            <button class="overlay-button">View</button>
+                            <button class="overlay-button">Edit</button>
+                        </div>
+                    </div>
+                    <div class="image-details">
+                        <div class="image-name">Mountains.jpg</div>
+                        <div class="image-date">Uploaded on Mar 28, 2025</div>
+                    </div>
+                </div>
+                
+                <div class="image-card">
+                    <div class="image-container">
+                        <img src="/api/placeholder/400/320" alt="Sample Image">
+                        <div class="image-overlay">
+                            <button class="overlay-button">View</button>
+                            <button class="overlay-button">Edit</button>
+                        </div>
+                    </div>
+                    <div class="image-details">
+                        <div class="image-name">Beach.jpg</div>
+                        <div class="image-date">Uploaded on Mar 15, 2025</div>
+                    </div>
+                </div>
+                
+                <div class="image-card">
+                    <div class="image-container">
+                        <img src="/api/placeholder/400/320" alt="Sample Image">
+                        <div class="image-overlay">
+                            <button class="overlay-button">View</button>
+                            <button class="overlay-button">Edit</button>
+                        </div>
+                    </div>
+                    <div class="image-details">
+                        <div class="image-name">Forest.jpg</div>
+                        <div class="image-date">Uploaded on Mar 10, 2025</div>
+                    </div>
+                </div>
+                
+                <div class="image-card">
+                    <div class="image-container">
+                        <img src="/api/placeholder/400/320" alt="Sample Image">
+                        <div class="image-overlay">
+                            <button class="overlay-button">View</button>
+                            <button class="overlay-button">Edit</button>
+                        </div>
+                    </div>
+                    <div class="image-details">
+                        <div class="image-name">City.jpg</div>
+                        <div class="image-date">Uploaded on Feb 27, 2025</div>
+                    </div>
+                </div>
+                
+                <div class="image-card">
+                    <div class="image-container">
+                        <img src="/api/placeholder/400/320" alt="Sample Image">
+                        <div class="image-overlay">
+                            <button class="overlay-button">View</button>
+                            <button class="overlay-button">Edit</button>
+                        </div>
+                    </div>
+                    <div class="image-details">
+                        <div class="image-name">Lake.jpg</div>
+                        <div class="image-date">Uploaded on Feb 15, 2025</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <!-- Upload Modal -->
+    <div class="upload-modal" id="upload-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Upload Images</h2>
+                <button class="close-btn" id="close-modal">&times;</button>
+            </div>
+            
+            <form class="upload-form">
+                <div class="file-input-container" id="file-drop-area">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#4285f4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                        <polyline points="17 8 12 3 7 8"></polyline>
+                        <line x1="12" y1="3" x2="12" y2="15"></line>
+                    </svg>
+                    <p>Drag and drop your images here</p>
+                    <span>or</span>
+                    <label for="file-input" class="file-label">Browse Files</label>
+                    <input type="file" id="file-input" multiple accept="image/*">
+                </div>
+                
+                <button type="submit" class="action-btn">
+                    Upload Images
+                </button>
+            </form>
+        </div>
+    </div>
+</body>
