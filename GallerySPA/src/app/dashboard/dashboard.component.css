@@ -33,6 +33,11 @@ header {
     gap: 15px;
 }
 
+.drag-over {
+    background-color: #f0f8ff !important;
+    border-color: #4285f4 !important;
+  }
+
 .user-name {
     font-weight: 500;
 }

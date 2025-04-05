@@ -1,55 +1,41 @@
 <body>
     <div class="container">
         <h1>Login to Gallery</h1>
-        <form id="login-form">
+        <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
             <div class="form-group">
                 <label for="email">Email</label>
-                <input type="email" id="email" name="email" required>
-                <div class="error-message" id="email-error">Please enter a valid email address</div>
+                <input 
+                    type="email" 
+                    id="email" 
+                    formControlName="email" required>
+                <div *ngIf="email?.invalid && (email?.dirty || email?.touched)" class="error-message">
+                    <div *ngIf="email?.errors?.['required']">Email is required</div>
+                    <div *ngIf="email?.errors?.['email']">Please enter a valid email</div>
+                </div>
             </div>
             <div class="form-group">
                 <label for="password">Password</label>
-                <input type="password" id="password" name="password" required>
-                <div class="error-message" id="password-error">Password must be at least 6 characters</div>
+                <input 
+                    type="password" 
+                    id="password" 
+                    formControlName="password" required>
+                <div *ngIf="password?.invalid && (password?.dirty || password?.touched)" class="error-message">
+                    <div *ngIf="password?.errors?.['required']">Password is required</div>
+                    <div *ngIf="password?.errors?.['minlength']">Password must be at least 6 characters</div>
+                </div>
             </div>
-            <button type="submit">Login</button>
+            <div *ngIf="errorMessage" class="error-message global-error">
+                {{ errorMessage }}
+            </div>
+            <button 
+                [disabled]="loginForm.invalid || isLoading" 
+                type="submit">
+                {{ isLoading ? 'Logging in...' : 'Login' }}
+            </button>
         </form>
         <div class="links">
-            <a href="register.html">Create an account</a>
-            <a href="forgot-password.html">Forgot password?</a>
+            <a routerLink="/register">Create an account</a>
+            <a routerLink="/forgot-password">Forgot password?</a>
         </div>
     </div>
-
-    <script>
-        document.getElementById('login-form').addEventListener('submit', function(event) {
-            event.preventDefault();
-            
-            // Validate email
-            const email = document.getElementById('email').value;
-            const emailError = document.getElementById('email-error');
-            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            
-            if (!emailRegex.test(email)) {
-                emailError.style.display = 'block';
-                return;
-            } else {
-                emailError.style.display = 'none';
-            }
-            
-            // Validate password
-            const password = document.getElementById('password').value;
-            const passwordError = document.getElementById('password-error');
-            
-            if (password.length < 6) {
-                passwordError.style.display = 'block';
-                return;
-            } else {
-                passwordError.style.display = 'none';
-            }
-            
-            // If validation passes, redirect to dashboard
-            // In a real application, you would send the login data to a server
-            window.location.href = 'dashboard.html';
-        });
-    </script>
 </body>
