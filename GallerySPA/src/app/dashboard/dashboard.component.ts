@@ -1,6 +1,7 @@
 import { Component, ViewChild, ElementRef } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { AuthService } from '../services/auth.service';
+import { User } from '../models/user.model';
 
 @Component({
   selector: 'app-dashboard',
@@ -11,12 +12,26 @@ import { AuthService } from '../services/auth.service';
 })
 export class DashboardComponent {
   @ViewChild('fileInput') fileInput!: ElementRef;
-
+  user!:User;
   showUploadModal = false;
   isDragging = false;
   selectedFiles: File[] = [];
 
   constructor(private authService: AuthService){}
+
+  ngOnInit(){
+    this.authService.user$.subscribe({
+      next: (resp) => {
+        if(resp)
+        {
+          this.user = resp;
+        }
+      },
+      error: (err) => {
+        console.log(`error on user data ${err}`);
+      }
+    })
+  }
 
   signOut(){
     this.authService.signOut();

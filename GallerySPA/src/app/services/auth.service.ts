@@ -4,12 +4,13 @@ import { User } from '../models/user.model';
 import { map, Observable, of, switchMap, take } from 'rxjs';
 import { AngularFireAuth } from '@angular/fire/compat/auth';
 import { Router } from '@angular/router';
+import { GoogleAuthProvider } from '@angular/fire/auth';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
-
+  
   user$: Observable<User | null>;
   
   constructor(
@@ -18,27 +19,18 @@ export class AuthService {
     private router: Router,
     private injector: EnvironmentInjector
   ) {
-    // Get auth data, then get firestore user document or null
     this.user$ = this.afAuth.authState.pipe(
-      switchMap(user => {
-        if (user) {
-          return this.firestore.doc<User>(`users/${user.uid}`).valueChanges().pipe(
-            map(userData => {
-              // Ensure we have the most current Firebase auth data
-              return {
-                uid: user.uid,
-                email: user.email,
-                displayName: user.displayName || userData?.displayName,
-                photoURL: user.photoURL || userData?.photoURL,
-                emailVerified: user.emailVerified,
-                lastLogin: Date.now(),
-                ...userData
-              } as User;
-            })
-          );
-        } else {
-          return of(null);
-        }
+      map(user => {
+        if (!user) return null;
+        
+        return {
+          uid: user.uid,
+          email: user.email || '',
+          displayName: user.displayName || '',
+          photoURL: user.photoURL || '',
+          emailVerified: user.emailVerified || false,
+          lastLogin: Date.now()
+        } as User;
       })
     );
   }
@@ -51,56 +43,99 @@ export class AuthService {
       const credential = await this.afAuth.createUserWithEmailAndPassword(email, password);
       const user = credential.user;
       
-      // Update display name if provided
       if (user && displayName) {
         await user.updateProfile({ displayName });
       }
       
-      // Try to save to Firestore but don't let it stop the app flow
       if (user) {
         try {
           await this.setUserData(user, { displayName }).catch(err => {
             console.warn('Non-critical error setting user data:', err);
-            // Continue despite the error
           });
         } catch (firestoreError) {
-          // Log the error but don't stop the signup process
           console.warn('Could not save user profile data, but user was created:', firestoreError);
         }
         
-        // Continue with navigation regardless of whether setUserData succeeded
         this.router.navigate(['/dashboard']);
       }
     } catch (error) {
       console.error('Sign up error:', error);
-      throw error; // Re-throw auth errors since these are critical
+      throw error; 
     }
   }
 
-  /**
-   * Sign in with email and password
-   */
-  async signIn(email: string, password: string): Promise<void> {
+/**
+ * Sign in with email and password
+ */
+async signIn(email: string, password: string): Promise<void> {
+  try {
+    const credential = await this.afAuth.signInWithEmailAndPassword(email, password);
+    
+    if (!credential.user) {
+      throw new Error('No user returned after authentication');
+    }
+    console.log('User successfully authenticated:', credential.user.uid);
     try {
-      const credential = await this.afAuth.signInWithEmailAndPassword(email, password);
-      
-      // Update user data on login
-      if (credential.user) {
-        await this.updateUserData(credential.user);
-        this.router.navigate(['/dashboard']);
-      }
-    } catch (error) {
-      console.error('Sign in error:', error);
-      throw error;
+      await this.updateUserData(credential.user);
+    } catch (updateError) {
+      console.warn('Could not update user data but login successful:', updateError);
+    }
+    
+    this.router.navigate(['/dashboard']);
+    
+  } catch (error: any) {
+    console.error('Sign in error:', error);
+    
+    // Provide more specific error messages based on Firebase error codes
+    if (error.code === 'auth/user-not-found') {
+      throw new Error('User with this email does not exist');
+    } else if (error.code === 'auth/wrong-password') {
+      throw new Error('Incorrect password');
+    } else if (error.code === 'auth/too-many-requests') {
+      throw new Error('Too many failed login attempts, please try again later');
+    } else if (error.code === 'auth/user-disabled') {
+      throw new Error('This account has been disabled');
+    } else {
+      // Generic error message for other cases
+      throw new Error('Login failed. Please check your credentials and try again.');
     }
   }
+}
+
+async signInWithGoogleAccount() : Promise<void> {
+  const googleAuthProvider = new GoogleAuthProvider();
+  googleAuthProvider.addScope('email');
+  googleAuthProvider.addScope('profile');
+  try {
+    const result = await this.afAuth.signInWithPopup(googleAuthProvider);
+  
+    try {
+      if(result.user){
+        console.log(`View user data ${result.user}`)
+        this.updateUserData(result.user);
+        this.router.navigate(['/dashboard']);
+      }
+    }catch(loginError){
+      console.log(loginError);
+    }
+  }catch(error){
+    console.log(`An error occured with google auth ${error}`);
+    return Promise.reject(error);
+  }
+}
 
   /**
    * Sign out
    */
   async signOut(): Promise<void> {
-    await this.afAuth.signOut();
-    this.router.navigate(['/login']);
+    try {
+      await this.afAuth.signOut();
+      this.router.navigate(['/login']);
+      console.log('User signed out successfully');
+    } catch (error) {
+      console.error('Sign out error:', error);
+      throw error;
+    }
   }
 
   /**
@@ -184,18 +219,17 @@ export class AuthService {
   /**
    * Set user data in Firestore on registration
    */
-  private async updateUserData(user: any): Promise<void> {
+  public async updateUserData(user: any): Promise<void> {
     // Explicitly run the Firestore operation within the injection context
     return runInInjectionContext(this.injector, async () => {
       const userPath = `users/${user.uid}`;
       const userRef = this.firestore.doc<User>(userPath);
 
       const userData = {
-        // Ensure all necessary fields are included, avoid spreading 'user' directly if it contains methods or complex objects
         uid: user.uid,
-        email: user.email || '', // Add null checks
-        displayName: user.displayName || '', // Add null checks
-        photoURL: user.photoURL || '', // Add null checks
+        email: user.email || '', 
+        displayName: user.displayName || '', 
+        photoURL: user.photoURL || '', 
         emailVerified: user.emailVerified || false,
         lastLogin: Date.now()
       };
@@ -204,7 +238,6 @@ export class AuthService {
         await userRef.set(userData, { merge: true });
       } catch (error) {
          console.error('Error updating user data in Firestore:', error);
-         // Decide if you need to re-throw or handle differently
          throw error;
       }
     });
@@ -236,7 +269,6 @@ export class AuthService {
            await userRef.set(userData, { merge: true });
         } catch (error) {
            console.error('Error setting user data in Firestore:', error);
-           // Handle or re-throw as needed
            throw error;
          }
     });

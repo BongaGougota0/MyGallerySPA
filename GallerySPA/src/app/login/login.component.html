@@ -1,7 +1,15 @@
 <body>
     <div class="container">
         <h1>Login to Gallery</h1>
+        <button 
+            class="google-btn" 
+            (click)="signInWithGoogle()" 
+            [disabled]="loading">
+            <i class="fab fa-google"></i>
+            Sign in with Google
+        </button>
         <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+
             <div class="form-group">
                 <label for="email">Email</label>
                 <input 
