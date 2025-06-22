@@ -1,44 +1,43 @@
-import { Component, ViewChild, ElementRef } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { Component, OnInit } from '@angular/core';
 import { AuthService } from '../services/auth.service';
 import { User } from '../models/user.model';
+import { NgIf } from '@angular/common';
+import { UploadComponent } from '../upload/upload.component';
 
 @Component({
   selector: 'app-dashboard',
-  imports: [],
+  imports: [NgIf, UploadComponent],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.css',
   host: { ngSkipHydration: 'true' }
 })
-export class DashboardComponent {
-  @ViewChild('fileInput') fileInput!: ElementRef;
-  user!:User;
+export class DashboardComponent implements OnInit {
+  user!: User;
   showUploadModal = false;
   isDragging = false;
   selectedFiles: File[] = [];
 
-  constructor(private authService: AuthService){}
+  constructor(private authService: AuthService) {}
 
-  ngOnInit(){
+  ngOnInit() {
     this.authService.user$.subscribe({
       next: (resp) => {
-        if(resp)
-        {
+        if (resp) {
           this.user = resp;
         }
       },
       error: (err) => {
         console.log(`error on user data ${err}`);
       }
-    })
+    });
   }
 
-  signOut(){
+  signOut() {
     this.authService.signOut();
   }
 
-
   openUploadModal() {
+    console.log('open modal clicked.');
     this.showUploadModal = true;
   }
   
@@ -62,7 +61,6 @@ export class DashboardComponent {
     this.isDragging = false;
     
     if (event.dataTransfer?.files) {
-      // Convert FileList to Array
       const files = Array.from(event.dataTransfer.files);
       this.handleFiles(files);
     }
@@ -79,20 +77,20 @@ export class DashboardComponent {
   handleFiles(files: File[]) {
     // Filter only images
     this.selectedFiles = files.filter(file => file.type.startsWith('image/'));
-    
     // Here you could add code to preview the images if needed
   }
   
   uploadImages(event: Event) {
     event.preventDefault();
-    
     if (this.selectedFiles.length > 0) {
       // Here you would implement the file upload logic
       console.log('Uploading files:', this.selectedFiles);
-      
       // After upload is complete:
       // this.closeUploadModal();
     }
   }
-  
+
+  handleCloseEvent(closeEvent: boolean) {
+    this.closeUploadModal();
+  }
 }
